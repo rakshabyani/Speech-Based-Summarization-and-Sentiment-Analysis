@@ -2,32 +2,37 @@ from pydub import AudioSegment
 from dataLocations import dataParameters
 import pickle
 import os
-with open("silbData.pkl") as f:
-    data = pickle.load(f)
+from utils import  *
 
-def createDir(path):
-    try:
-        os.makedirs(os.path.dirname(filename))
-    except OSError as exc:  # Guard against race condition
-        if exc.errno != errno.EEXIST:
-            raise
+def getsilbData():
+    fileName=dataParameters.getFile("silbData")
+    filepath=dataParameters.getPath("modelResults")
+    with open(filepath+fileName) as f:
+        data = pickle.load(f)
+    return data
 
-for file in data:
-    sound = AudioSegment.from_mp3(dataParameters.getPath("wav")+file+"wav")
-    timeline = file["timeFragments"]
-    print sound.duration_seconds
-    # len() and slicing are in milliseconds
-    start = timeline[0]
-    i=1
-    while i<len(timeline):
-        w=sound[start*1000:timeline[i]*1000]
-        print "exporting data wave "+ str(i)
-        filename = dataParameters.getPath("wavTargets")+file+str(i-1)+".wav"
-        if not os.path.exists(os.path.dirname(dataParameters.getPath("wavTargets"))):
-            createDir(filename)
-        else:
+def checkDir(path):
+    if not checkDirExistance(path):
+        createDir(path)
+    return
+
+def segmentAudio(data):
+    for file in data:
+        sound = AudioSegment.from_mp3(dataParameters.getPath("wav")+file+".wav")
+        timeline = data[file]["timeFragments"]
+        print sound.duration_seconds
+        # len() and slicing are in milliseconds
+        start = timeline[0]
+        i=1
+        emotion = data[file]["emotion"]
+        while i<len(timeline):
+            w=sound[start*1000:timeline[i]*1000]
+            print "exporting data wave "+ str(i)
+            filename = dataParameters.getPath("wavTargets")+ emotion +"/"+ file+str(i-1)+".wav"
+            checkDir(filename)
             w.export(filename, format="wav")
-        start=timeline[i]
-        i+=1
+            start=timeline[i]
+            i+=1
 
-
+model = getsilbData()
+segmentAudio(model)

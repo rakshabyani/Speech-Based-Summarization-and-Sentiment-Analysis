@@ -1,10 +1,8 @@
-from enum import Enum
-
-class emotionCodes():
+class emotionCodes(object):
     emotionCodes = {"W": "Anger", "L": "Boredom", "E": "Disgust", "A": "Anxiety", "F": "Happiness", "T": "Sadness",
                     "N": "Neutral"}
-
-    def getEmotion(code):
-        if emotionCodes.has_key(code):
-            return emotionCodes[code]
+    @classmethod
+    def getEmotion(cls,code):
+        if cls.emotionCodes.has_key(code):
+            return cls.emotionCodes[code]
         return None
