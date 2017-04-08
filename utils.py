@@ -29,4 +29,9 @@ def listFiles(path):
         print "error in getFolders: ",e.message
 
 def getFileName(path):
+    '''
+    @getFileName is used to get name of the file from given path
+    :param path: path to extract the file name
+    :return: file name
+    '''
     return (path.split("/")[-1]).split(".")[0]
