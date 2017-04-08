@@ -1,21 +1,35 @@
 from pydub import AudioSegment
 from dataLocations import dataParameters
 import pickle
-from utils import  *
+from utils import *
 
 def getsilbData():
-    fileName=dataParameters.getFile("silbData")
-    filepath=dataParameters.getPath("modelResults")
+    '''
+    @getsilbData reads all the wav files data from the silb model
+    :return: model dictionary
+    '''
+    fileName = dataParameters.getFile("silbData")
+    filepath = dataParameters.getPath("results")
     with open(filepath+fileName) as f:
         data = pickle.load(f)
     return data
 
 def checkDir(path):
+    '''
+    @checkDir checks the existence of the directory/file else creates the directory/file
+    :param path: path to directory/file
+    :return:
+    '''
     if not checkDirExistance(path):
         createDir(path)
     return
 
 def segmentAudio(data):
+    '''
+    @segmentAudio reads the sound files and segments into tokens based on the model
+    :param data: model
+    :return:
+    '''
     for file in data:
         sound = AudioSegment.from_mp3(dataParameters.getPath("wav")+file+".wav")
         timeline = data[file]["timeFragments"]
