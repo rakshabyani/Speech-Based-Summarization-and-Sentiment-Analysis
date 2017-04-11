@@ -16,7 +16,7 @@ def getPitch(signal,Fs):
     '''
     crossing = [math.copysign(1.0, s) for s in signal]
     index = find(np.diff(crossing));
-    f0=round(len(index) *Fs /(2*np.prod(len(signal))))
+    f0 = round(len(index) *Fs /(2*np.prod(len(signal))))
     return f0
 
 def getRMS(sound):
@@ -91,15 +91,21 @@ def buildModel():
     '''
     path = dataParameters.getPath("wavTargets")
     modelPath = dataParameters.getPath("modelResults")
+    if not checkDirExistance(modelPath):
+        try:
+            createDir(path)
+        except OSError as e:
+            print "Error in build model while creating directory with message: ", e.message
     for folder in listFiles(path):
         df = getDataFrame(path,folder)
+        #print df
         df.to_pickle(modelPath+folder+".pkl")
     return
 
 
-#buildModel()
-
-'''plt.subplot(2,1,1); plt.plot(F[0,:]); plt.xlabel('Frame no'); plt.ylabel('ZCR');
+buildModel()
+'''
+plt.subplot(2,1,1); plt.plot(F[0,:]); plt.xlabel('Frame no'); plt.ylabel('ZCR');
 plt.subplot(2,1,2); plt.plot(F[1,:]); plt.xlabel('Frame no'); plt.ylabel('Energy');
 plt.subplot(2,1,1); plt.plot(F2[0,:]); plt.xlabel('Frame no'); plt.ylabel('ZCR');
 plt.subplot(2,1,2); plt.plot(F2[1,:]); plt.xlabel('Frame no'); plt.ylabel('Energy');
