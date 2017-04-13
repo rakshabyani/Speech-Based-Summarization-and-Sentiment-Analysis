@@ -99,6 +99,7 @@ def buildModel():
     for folder in listFiles(path):
         df = getDataFrame(path,folder)
         #print df
+        open(modelPath+folder+".pkl",'a').close()
         df.to_pickle(modelPath+folder+".pkl")
     return
 
