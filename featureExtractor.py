@@ -2,6 +2,7 @@ from pyAudioAnalysis import audioBasicIO, audioFeatureExtraction
 import matplotlib.pyplot as plt
 from matplotlib.mlab import find
 from dataLocations import dataParameters
+from modelDimensions import modelDimensions
 import numpy as np
 import math
 import pandas as pd
@@ -52,8 +53,8 @@ def getFeatures(filePath):
     values={}
     [Fs, x] = audioBasicIO.readAudioFile(filePath)
     F = audioFeatureExtraction.stFeatureExtraction(x, Fs, 0.050 * Fs, 0.025 * Fs)
-    values['F0'] = getPitch(x,Fs)
-    values['loudness'] = getRMS(x)
+    values['F0'] = np.array([getPitch(x,Fs)], dtype=np.float64)
+    values['loudness'] = np.array([getRMS(x)], dtype=np.float64)
     values['ZCR'] = F[0] #Zero Crossing Rate
     values['energyEntropy'] = F[2] #Entropy of Energy
     values['spectralCentroid'] = F[3] #Spectral Centroid
@@ -67,6 +68,73 @@ def getFeatures(filePath):
     values['chromaDeviation'] = F[33] #Chroma Deviation
     return values
 
+def getNewArray(shape):
+    '''
+    @getNewArray creates new numpy array of specified shape
+    :param shape: new shape of array
+    :return: new array with desired shape
+    '''
+    return np.zeros(shape=shape, dtype=np.float64)
+
+def copyData(oldMatrix, newMatrix):
+    '''
+    @copyData copies values to new Matrix
+    :param oldMatrix: old numpy matrix
+    :param newMatrix: new numpy matrix with new dimensions
+    :return: new matrix with data
+    '''
+    (rows, column) = (None, None)
+    try:
+        (rows, column) = oldMatrix.shape
+    except Exception as e:
+        x = oldMatrix.shape
+        oldMatrix = np.reshape(oldMatrix,(1,x[0]))
+        (rows, column) = oldMatrix.shape
+    finally:
+        for i in xrange(rows):
+            newMatrix[i,:column] = oldMatrix[i,:]
+    return newMatrix
+
+def reshapeArrays(features):
+    '''
+    @reshapeArrays reshapes the feature arrays as per specifications to create a generalised model
+    :param features: feature dictionary
+    :return: feature dictionary with reshaped arrays
+    '''
+    newFeatureDict = {}
+    for feature in features.keys():
+        newMatrix = getNewArray(modelDimensions.getDimension(feature))
+        if feature == 'loudness' or feature == 'F0':
+            newMatrix = features[feature]
+        else:
+            newMatrix = copyData(features[feature], newMatrix)
+        newFeatureDict[feature] = newMatrix
+    return newFeatureDict
+
+def computeTotal(features,avg_Dict):
+    '''
+    @computeTotal computes the sum values for an emotion type
+    :param features: feature values
+    :param avg_Dict: dictionary containing sum of vectors/matrix
+    :return: dictionary containing sum of values/matrix
+    '''
+    if avg_Dict:
+        for feature in features:
+            avg_Dict[feature] = np.add(avg_Dict[feature],features[feature])
+    else:
+        avg_Dict = features
+    return avg_Dict
+
+def computeAvg(avg_dict,n):
+    #e / e.sum(axis=1)[:, None]
+    for feature in avg_dict.keys():
+        if feature == 'loudness' or feature == 'F0':
+            avg_dict[feature] = avg_dict[feature]/n
+        else:
+            avg_dict[feature] = avg_dict[feature] / avg_dict[feature].sum(axis=1)[:, None]
+    return avg_dict
+
+
 def getDataFrame(filePath,emotion):
     '''
     @getDataFrame creates a model for each emotion in the fragment folder
@@ -75,14 +143,18 @@ def getDataFrame(filePath,emotion):
     :return: model for the emotion as pandas Data Frame
     '''
     df = pd.DataFrame(columns=('F0', 'spectralCentroid', 'MFCC', 'energy', 'chroma', 'spectralFlux', 'spectralSpread', 'spectralEntropy', 'ZCR', 'loudness', 'energyEntropy', 'chromaDeviation', 'spectralRolloff'))
+    avg_dict={}
     path = filePath+emotion
     for filename in listFiles(path):
         try:
             val = getFeatures(path+"/"+filename)
+            val = reshapeArrays(val)
+            avg_dict = computeTotal(val,avg_dict)
             df.loc[filename.split(".")[0]] = val.values()
         except Exception as e:
             print filename, emotion, e.message
-    return df
+    avg_dict = computeAvg(avg_dict,df.shape[0])
+    return df, avg_dict
 
 def buildModel():
     '''
@@ -96,11 +168,21 @@ def buildModel():
             createDir(path)
         except OSError as e:
             print "Error in build model while creating directory with message: ", e.message
+    avg_df = pd.DataFrame(columns=(
+    'F0', 'spectralCentroid', 'MFCC', 'energy', 'chroma', 'spectralFlux', 'spectralSpread', 'spectralEntropy', 'ZCR',
+    'loudness', 'energyEntropy', 'chromaDeviation', 'spectralRolloff'))
     for folder in listFiles(path):
-        df = getDataFrame(path,folder)
-        #print df
-        open(modelPath+folder+".pkl",'a').close()
+        df,avg_dict = getDataFrame(path,folder)
+        print df
+        avg_df.loc[folder] = avg_dict.values()
+        open(modelPath+folder+".csv",'a').close()
+        open(modelPath + folder + ".pkl", 'a').close()
         df.to_pickle(modelPath+folder+".pkl")
+        df.to_csv(modelPath+folder+".csv")
+    open(modelPath + "averageValues.csv", 'a').close()
+    avg_df.to_csv(modelPath + "averageValues.csv")
+    open(modelPath + "averageValues.csv", 'a').close()
+    avg_df.to_pickle(modelPath + "averageValues.pkl")
     return
 
 
