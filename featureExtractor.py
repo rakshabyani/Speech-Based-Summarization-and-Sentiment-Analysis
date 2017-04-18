@@ -125,6 +125,39 @@ def computeTotal(features,avg_Dict):
         avg_Dict = features
     return avg_Dict
 
+
+def reshapeArraysForSentences(features):
+    '''
+    @reshapeArrays reshapes the feature arrays as per specifications to create a generalised model
+    :param features: feature dictionary
+    :return: feature dictionary with reshaped arrays
+    '''
+    newFeatureDict = {}
+    for feature in features.keys():
+        newMatrix = getNewArray(modelDimensions.getSentenceDimension(feature))
+        if feature == 'loudness' or feature == 'F0':
+            newMatrix = features[feature]
+        else:
+            newMatrix = copyData(features[feature], newMatrix)
+        newFeatureDict[feature] = newMatrix
+    return newFeatureDict
+
+
+def computeTotalSentences(features,avg_Dict):
+    '''
+    @computeTotal computes the sum values for an emotion type
+    :param features: feature values
+    :param avg_Dict: dictionary containing sum of vectors/matrix
+    :return: dictionary containing sum of values/matrix
+    '''
+    if avg_Dict:
+        for feature in features:
+            avg_Dict[feature] = np.add(avg_Dict[feature],features[feature])
+    else:
+        avg_Dict = features
+    return avg_Dict
+
+
 def computeAvg(avg_dict,n):
     #e / e.sum(axis=1)[:, None]
     for feature in avg_dict.keys():
@@ -133,6 +166,28 @@ def computeAvg(avg_dict,n):
         else:
             avg_dict[feature] = avg_dict[feature] / avg_dict[feature].sum(axis=1)[:, None]
     return avg_dict
+
+
+def getDataFrameForSentences(filePath,emotion):
+    '''
+    @getDataFrame creates a model for each emotion in the fragment folder
+    :param filePath: folder containing sound fragments for different emotions
+    :param emotion: emotion name
+    :return: model for the emotion as pandas Data Frame
+    '''
+    df = pd.DataFrame(columns=('F0', 'spectralCentroid', 'MFCC', 'energy', 'chroma', 'spectralFlux', 'spectralSpread', 'spectralEntropy', 'ZCR', 'loudness', 'energyEntropy', 'chromaDeviation', 'spectralRolloff'))
+    avg_dict={}
+    path = filePath+emotion
+    for filename in listFiles(path):
+        try:
+            val = getFeatures(path+"/"+filename)
+            val = reshapeArraysForSentences(val)
+            avg_dict = computeTotalSentences(val,avg_dict)
+            df.loc[filename.split(".")[0]] = val.values()
+        except Exception as e:
+            print filename, emotion, e.message
+    avg_dict = computeAvg(avg_dict,df.shape[0])
+    return df, avg_dict
 
 
 def getDataFrame(filePath,emotion):
@@ -156,7 +211,7 @@ def getDataFrame(filePath,emotion):
     avg_dict = computeAvg(avg_dict,df.shape[0])
     return df, avg_dict
 
-def buildModel():
+def buildModelForTokens():
     '''
     @buildModel builds the model for each emotion
     :return:
@@ -165,7 +220,7 @@ def buildModel():
     modelPath = dataParameters.getPath("modelResults")
     if not checkDirExistance(modelPath):
         try:
-            createDir(path)
+            createDir(modelPath)
         except OSError as e:
             print "Error in build model while creating directory with message: ", e.message
     avg_df = pd.DataFrame(columns=(
@@ -185,8 +240,39 @@ def buildModel():
     avg_df.to_pickle(modelPath + "averageValues.pkl")
     return
 
+def buildModelForSentences():
+    '''
+    @buildModel builds the model for each emotion
+    :return:
+    '''
+    path = dataParameters.getPath("wavSentences")
+    modelPath = dataParameters.getPath("sentenceModel")
+    if not checkDirExistance(modelPath):
+        try:
+            createDir(modelPath)
+        except OSError as e:
+            print "Error in build model while creating directory with message: ", e.message
+    avg_df = pd.DataFrame(columns=(
+        'F0', 'spectralCentroid', 'MFCC', 'energy', 'chroma', 'spectralFlux', 'spectralSpread', 'spectralEntropy',
+        'ZCR',
+        'loudness', 'energyEntropy', 'chromaDeviation', 'spectralRolloff'))
+    for folder in listFiles(path):
+        df, avg_dict = getDataFrameForSentences(path, folder)
+        print df
+        avg_df.loc[folder] = avg_dict.values()
+        open(modelPath + folder + ".csv", 'a').close()
+        open(modelPath + folder + ".pkl", 'a').close()
+        df.to_pickle(modelPath + folder + ".pkl")
+        df.to_csv(modelPath + folder + ".csv")
+    open(modelPath + "averageValues.csv", 'a').close()
+    avg_df.to_csv(modelPath + "averageValues.csv")
+    open(modelPath + "averageValues.csv", 'a').close()
+    avg_df.to_pickle(modelPath + "averageValues.pkl")
+    return
 
-buildModel()
+
+buildModelForTokens()
+buildModelForSentences()
 '''
 plt.subplot(2,1,1); plt.plot(F[0,:]); plt.xlabel('Frame no'); plt.ylabel('ZCR');
 plt.subplot(2,1,2); plt.plot(F[1,:]); plt.xlabel('Frame no'); plt.ylabel('Energy');

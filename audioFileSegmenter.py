@@ -33,11 +33,13 @@ def segmentAudio(data):
     for file in data:
         sound = AudioSegment.from_mp3(dataParameters.getPath("wav")+file+".wav")
         timeline = data[file]["timeFragments"]
-        print sound.duration_seconds
+        #print sound.duration_seconds
         # len() and slicing are in milliseconds
         start = timeline[0]
         i=1
         emotion = data[file]["emotion"]
+        checkDir(dataParameters.getPath("wavSentences") + emotion + "/")
+        sound.export(dataParameters.getPath("wavSentences") + emotion + "/" + file + ".wav", format="wav")
         while i<len(timeline):
             w=sound[start*1000:timeline[i]*1000]
             print "exporting data wave "+ str(i)
