@@ -7,11 +7,13 @@ from utils import *
 data={}
 fileInfo = {}
 
-
-def getFiles(path):
-    return os.listdir(path)
-
 def getFileInfo(file,path):
+    '''
+    @getFileInfo reads all the silb data from the dataset
+    :param file: file name
+    :param path: path
+    :return:
+    '''
     global fileInfo
     tokens = []
     timelines = []
@@ -36,14 +38,18 @@ def processData():
         path = dataParameters.getPath("silb")
     except NameError as e:
         print e.message
-    files=getFiles(path)
+    files = listFiles(path)
     for fileName in files:
         getFileInfo(fileName,path)
     print fileInfo
 
 def writeSilbData():
-    fileName=dataParameters.getFile("silbData")
-    filepath=dataParameters.getPath("modelResults")
+    '''
+    @writeSilbData writes the model of silbs and the timeline for tokens to pickle file
+    :return:
+    '''
+    fileName = dataParameters.getFile("silbData")
+    filepath = dataParameters.getPath("results")
     if not checkDirExistance(filepath+fileName) :
         createDir(filepath+fileName)
     with open(filepath+fileName,"w") as f:
