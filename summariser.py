@@ -8,8 +8,8 @@ from sklearn.feature_extraction.text import TfidfTransformer
 import networkx as nx
 
 
-#with open("original.txt",'r') as f:
- #   document=f.read()
+with open("original.txt",'r') as f:
+    document=f.read()
 
 def sentenceTokeniser(text):
     '''
@@ -23,7 +23,9 @@ def sentenceTokeniser(text):
     sentences=split(taggedSentences)
     for sentence in sentences:
         result.append(sentence.string)
+    print len(result)
     return result
+
 
 def normalisedBagofWordsMatrix(sentences):
     '''
@@ -71,4 +73,5 @@ def TextRank(document):
     return rankedSentences
 
 
-#print TextRank(document)
+for sentence in TextRank(document):
+    print sentence

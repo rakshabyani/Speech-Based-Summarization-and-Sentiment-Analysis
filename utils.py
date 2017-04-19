@@ -35,3 +35,15 @@ def getFileName(path):
     :return: file name
     '''
     return (path.split("/")[-1]).split(".")[0]
+
+def execute(query):
+    '''
+    @execute method executes the query given
+    :param query: query to execute
+    :return:
+    '''
+    try:
+        return os.system(query)
+    except Exception as e:
+        print "Error while executing command in execute with message: "+ e.message
+    return

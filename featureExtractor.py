@@ -290,4 +290,3 @@ plt.subplot(2,1,2); plt.plot(F1[1,:]); plt.xlabel('Frame no'); plt.ylabel('Energ
 
 
 
-
