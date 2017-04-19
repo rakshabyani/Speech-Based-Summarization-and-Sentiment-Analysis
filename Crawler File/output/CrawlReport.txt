@@ -1,0 +1,35 @@
+Name: Paridhi Verma
+USC ID: 5333348251
+News Site crawled: NY_Times
+
+Status Codes:
+=============
+200 OK = 3
+
+Fetch Statistics
+================
+# fetches attempted: 3
+# fetches succeeded: 3
+# fetches aborted: 0
+# fetches failed: 0
+
+Outgoing URLs:
+==============
+Total URLs extracted: 64
+# unique URLs extracted: 63
+# unique URLs within News Site: 56
+# unique USC URLs outside News Site: 7
+
+File Sizes:
+===========
+<1kb: 2
+1kb ~ 10kb: 0
+10kb ~ 100kb: 0
+100kb ~ 1mb: 1
+>= 1mb: 0
+
+Content Types:
+==============
+text/html: 1
+application/json: 1
+text/xml: 1
