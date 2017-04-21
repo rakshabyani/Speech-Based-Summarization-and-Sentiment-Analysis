@@ -73,5 +73,5 @@ def TextRank(document):
     return rankedSentences
 
 
-for sentence in TextRank(document):
-    print sentence
+#for sentence in TextRank(document):
+ #   print sentence
