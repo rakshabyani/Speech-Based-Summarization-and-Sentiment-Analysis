@@ -30,11 +30,11 @@ def classify():
     for f in listFiles(path):
         if f == "sample.pkl":
             dataframe = pd.read_pickle(path+f)
-        if "pkl" in f.split(".")[1]:
-        # if f == "averageValues.pkl":
-            df1 = pd.read_pickle(path+f)
-            df1.index=[f.split(".")[0]]*len(df1.index)
-            df = pd.concat([df,df1])
+        elif "pkl" in f.split(".")[1]:
+            if f != "averageValues.pkl":
+                df1 = pd.read_pickle(path+f)
+                df1.index=[f.split(".")[0]]*len(df1.index)
+                df = pd.concat([df,df1])
     #print df
 
     for feature in df:
@@ -93,8 +93,8 @@ def classify():
         # prediction(feature)
     # print probabilityArray
     # print max(probabilityArray[0])
-
-
+    predict_emotion(dataframe)
+    print get_emotion()
     '''
     # TESTING
     l=[]
@@ -116,6 +116,7 @@ def predict_emotion(df):
     predicted_class = []
     for feature in df:
         df1 = df[feature]
+        l = []
         if feature == 'F0':
             l = df1.tolist()
             predicted_class = F0_nb.predict(l)
@@ -125,49 +126,49 @@ def predict_emotion(df):
             predicted_class = spectralCentroid_nb.predict(l)
         elif feature == 'MFCC':
             for array in np.array(df1,dtype=pd.Series):
-                l.append(array.flatten())
+                l.append(array.flatten()[0])
             predicted_class = MFCC_nb.predict(l)
         elif feature == 'energy':
             for array in np.array(df1,dtype=pd.Series):
-                l.append(array[0])
+                l.append(array[0][0])
             predicted_class = energy_nb.predict(l)
         elif feature == 'chroma':
             for array in np.array(df1,dtype=pd.Series):
-                l.append(array.flatten())
+                l.append(array.flatten()[0])
             predicted_class = chroma_nb.predict(l)
         elif feature == 'spectralFlux':
             for array in np.array(df1,dtype=pd.Series):
-                l.append(array[0])
+                l.append(array[0][0])
             predicted_class = spectralFlux_nb.predict(l)
         elif feature == 'spectralSpread':
             for array in np.array(df1,dtype=pd.Series):
-                l.append(array[0])
+                l.append(array[0][0])
             predicted_class = spectralSpread_nb.predict(l)
         elif feature == 'spectralEntropy':
             for array in np.array(df1,dtype=pd.Series):
-                l.append(array[0])
+                l.append(array[0][0])
             predicted_class = spectralEntropy_nb.predict(l)
         elif feature == 'ZCR':
             for array in np.array(df1,dtype=pd.Series):
-                l.append(array[0])
+                l.append(array[0][0])
             predicted_class = ZCR_nb.predict(l)
         elif feature == 'loudness':
             l = df1.tolist()
             predicted_class = loudness_nb.predict(l)
         elif feature == 'energyEntropy':
             for array in np.array(df1,dtype=pd.Series):
-                l.append(array[0])
+                l.append(array[0][0])
             predicted_class = energyEntropy_nb.predict(l)
         elif feature == 'chromaDeviation':
             for array in np.array(df1,dtype=pd.Series):
-                l.append(array[0])
+                l.append(array[0][0])
             predicted_class = chromaDeviation_nb.predict(l)
         elif feature == 'spectralRolloff':
             for array in np.array(df1,dtype=pd.Series):
-                l.append(array[0])
+                l.append(array[0][0])
             predicted_class = spectralRolloff_nb.predict(l)
         # predicted_class = gnb.predict(l)
-        predictedClassArray.append(predicted_class)
+        predictedClassArray.append(predicted_class[0])
     return predictedClassArray
 
 def get_emotion():
