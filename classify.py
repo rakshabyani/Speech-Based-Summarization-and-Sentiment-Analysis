@@ -28,6 +28,8 @@ def classify():
     # path = path + "/models/"
     df= pd.DataFrame(columns=('F0', 'spectralCentroid', 'MFCC', 'energy', 'chroma', 'spectralFlux', 'spectralSpread', 'spectralEntropy', 'ZCR', 'loudness', 'energyEntropy', 'chromaDeviation', 'spectralRolloff'))
     for f in listFiles(path):
+        if f == "sample.pkl":
+            dataframe = pd.read_pickle(path+f)
         if "pkl" in f.split(".")[1]:
         # if f == "averageValues.pkl":
             df1 = pd.read_pickle(path+f)
