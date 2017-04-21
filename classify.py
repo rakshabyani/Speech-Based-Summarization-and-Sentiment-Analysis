@@ -89,6 +89,10 @@ def predict_emotion(df):
     predictedClassArray.append(predicted_class)
 
 
+def get_emotion():
+    return predictedClassArray
+
+
 '''
 For testing purpose
 '''
