@@ -6,7 +6,7 @@ from pydub import AudioSegment
 from dataLocations import dataParameters
 from featureExtractor import getFeatures,reshapeArraysForSentences
 import pandas as pd
-from summariser import sentenceTokeniser
+from summariser import sentenceTokeniser, TextRank
 from utils import *
 from classify import predict_emotion, classify
 import matplotlib.pyplot as plt
@@ -80,6 +80,7 @@ def createFragments(jsonfilePath,audiofilePath,outputPath):
             val = reshapeArraysForSentences(val)
             df.loc[0] = val.values()
             df.to_csv("sample.csv")
+            df.to_pickle("sample.pkl")
             print df
             emotions = predict_emotion(df.loc[0])
             emotions = Counter(emotions)
@@ -88,6 +89,10 @@ def createFragments(jsonfilePath,audiofilePath,outputPath):
         except Exception as e:
             print "Error in method with message: ", e.message
         i+=1
+    with codecs.open(filepathWithName+"EmotionsOutput.txt","w",encoding="utf-8") as f:
+        for sentence in tokenEmotions:
+            f.write(sentence+"\n")
+
 
 
 #createTimeFrames()
@@ -96,6 +101,13 @@ def createFragments(jsonfilePath,audiofilePath,outputPath):
 classify()
 createTimeFrames("./testData/test.mp3","./testData/test.txt")
 createFragments("./testData/test.json","./testData/test.mp3","")
+with codecs.open("./testData/test.txt",encoding="utf-8") as f:
+    summaryText = f.read()
+with codecs.open("./testData/testSummary.txt","w",encoding="utf-8") as f:
+    for sentence in TextRank(summaryText):
+    #   print sentence
+        f.write(sentence[1]+"\n")
+
 
 
 #df = pd.read_csv("./results/models/averageValues.csv")
