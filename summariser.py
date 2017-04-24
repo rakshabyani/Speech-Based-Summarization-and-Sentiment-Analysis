@@ -8,8 +8,8 @@ from sklearn.feature_extraction.text import TfidfTransformer
 import networkx as nx
 
 
-with open("original.txt",'r') as f:
-    document=f.read()
+#with open("original.txt",'r') as f:
+ #   document=f.read()
 
 def sentenceTokeniser(text):
     '''

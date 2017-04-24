@@ -222,6 +222,6 @@ def calculateProbability(temp) :
     else:
         probabilityArray[0] += temp
 
-classify()
+#classify()
 
 

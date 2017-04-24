@@ -272,7 +272,7 @@ def buildModelForSentences():
 
 
 #buildModelForTokens()
-buildModelForSentences()
+#buildModelForSentences()
 '''
 plt.subplot(2,1,1); plt.plot(F[0,:]); plt.xlabel('Frame no'); plt.ylabel('ZCR');
 plt.subplot(2,1,2); plt.plot(F[1,:]); plt.xlabel('Frame no'); plt.ylabel('Energy');
