@@ -271,8 +271,8 @@ def buildModelForSentences():
     return
 
 
-buildModelForTokens()
-buildModelForSentences()
+#buildModelForTokens()
+#buildModelForSentences()
 '''
 plt.subplot(2,1,1); plt.plot(F[0,:]); plt.xlabel('Frame no'); plt.ylabel('ZCR');
 plt.subplot(2,1,2); plt.plot(F[1,:]); plt.xlabel('Frame no'); plt.ylabel('Energy');
@@ -285,7 +285,6 @@ plt.subplot(2,2,2); plt.plot(F2[8,:]); plt.xlabel('Frame no'); plt.ylabel('spect
 plt.subplot(2,1,2); plt.plot(F1[1,:]); plt.xlabel('Frame no'); plt.ylabel('Energy1'); plt.show()
 
 '''
-
 
 
 

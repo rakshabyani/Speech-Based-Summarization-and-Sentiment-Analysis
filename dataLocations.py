@@ -2,7 +2,7 @@
 @dataParameters class contains information about the path locations and the file names used in the project
 '''
 class dataParameters(object):
-    filePaths = {"silb": "./emoDB/silb/", "wav": "./emoDB/wav/", "wavTargets": "./fragmentedAudio/", "results": "./results/", "modelResults": "./results/models/", "wavSentences": "./sentencesAudio/", "sentenceModel": "./results/models/sentenceModels/"}
+    filePaths = {"silb": "./emoDB/silb/", "wav": "./emoDB/wav/", "wavTargets": "./fragmentedAudio/", "results": "./results/", "modelResults": "./results/models/tokenModel/", "wavSentences": "./sentencesAudio/", "sentenceModel": "./results/models/sentenceModels/"}
     fileNames = {"silbData": "silbData.pkl"}
 
     @classmethod
