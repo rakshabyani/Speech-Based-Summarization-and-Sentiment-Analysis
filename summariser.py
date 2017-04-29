@@ -8,8 +8,8 @@ from sklearn.feature_extraction.text import TfidfTransformer
 import networkx as nx
 
 
-#with open("original.txt",'r') as f:
- #   document=f.read()
+with open("original.txt",'r') as f:
+    document=f.read()
 
 def sentenceTokeniser(text):
     '''
@@ -46,6 +46,7 @@ def getsimilarityGraph(matrix):
     '''
     similarity_graph = matrix * matrix.T
     nx_graph = nx.from_scipy_sparse_matrix(similarity_graph)
+    #nx.draw(nx_graph)
     return nx_graph
 
 def getTextRank(sentenceGraph,sentences):
@@ -67,11 +68,16 @@ def TextRank(document):
     :return: document summary
     '''
     sentences = sentenceTokeniser(document)
+    if len(sentences) <=11:
+        return sentences
     matrix = normalisedBagofWordsMatrix(sentences)
     similarityGraph = getsimilarityGraph(matrix)
     rankedSentences = getTextRank(similarityGraph,sentences)
-    return rankedSentences
+    return rankedSentences[:11]
 
-
-#for sentence in TextRank(document):
- #   print sentence
+#summary = TextRank(document)
+#if len(summary)<=11:
+ #   print summary
+#else:
+ #   for sentence in summary[:11]:
+  #      print sentence
